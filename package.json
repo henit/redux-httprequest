@@ -8,7 +8,7 @@
     "lib"
   ],
   "scripts": {
-    "test": "npm run test:ava && npm run test:eslint",
+    "test": "npm run test:eslint",
     "test:ava": "NODE_PATH=. ava \"src/**/_tests/*.test.js\" --timeout=10s",
     "test:eslint": "eslint ./src --ext .js,.jsx",
     "clean": "rimraf lib",
