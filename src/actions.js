@@ -66,6 +66,10 @@ actions.request = (params = {}) => {
                 });
             });
 
+        if (!res) {
+            return;
+        }
+
         const contentType = res.headers.get('Content-Type');
         const status = res.status;
 
