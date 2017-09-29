@@ -57,7 +57,13 @@ actions.request = (params = {}) => {
                 let error = new Error('Can\'t connect to url.');
                 error.details = e.message;
                 error.type = 'ConnectionError';
-                throw error;
+
+                dispatch({
+                    type: `HTTPREQUEST_${subject}_ERROR`,
+                    requestId,
+                    params,
+                    error
+                });
             });
 
         const contentType = res.headers.get('Content-Type');
@@ -98,30 +104,26 @@ actions.request = (params = {}) => {
                     error.details = body.details;
                 }
 
-                // throw error;
                 dispatch({
                     type: `HTTPREQUEST_${subject}_ERROR`,
                     requestId,
+                    status,
                     params,
                     error
                 });
-
-                throw error;
 
             } else {
                 // Error response
                 let error = new Error(res.statusText || 'Unknown request error');
                 error.status = status;
 
-                // throw error;
                 dispatch({
                     type: `HTTPREQUEST_${subject}_ERROR`,
                     requestId,
+                    status,
                     params,
                     error
                 });
-
-                throw error;
             }
         }
     };
