@@ -16,12 +16,15 @@ actions.request = (params = {}) => {
         method = 'GET',
         path = '',
         query = {},
-        body,
-        preserve = false
+        body
+        // preserve = false
         // priority = 3
     } = params;
     const requestId = params.requestId || `${method} ${path || '/'}`;
-    const subject = params.subject || requestId.replace(' ', '_').replace('/', '_');
+    const subject = `${method}_` + (
+        params.subject ||
+        requestId.replace(' ', '_').replace('/', '_').toUpperCase()
+    );
 
     return async (dispatch, getState) => {
         const url = baseUrl
@@ -77,10 +80,10 @@ actions.request = (params = {}) => {
             contentType.includes('application/json') || contentType.includes('application/hal+json')
         ));
 
+        const response = await (isJson ? res.json() : res.text());
+
         if (status >= 200 && status <= 290) {
             // Success response
-            const response = await (isJson ? res.json() : res.text());
-
             dispatch({
                 type: `HTTPREQUEST_${subject}_COMPLETE`,
                 receivedAt: (new Date()).toISOString(),
@@ -90,22 +93,16 @@ actions.request = (params = {}) => {
                 params
             });
 
-            return {
-                status,
-                // When preserving data, it should be read from the state
-                response: preserve ? null : response
-            };
+
 
         } else {
             // Error
             if (isJson) {
-                const body = await res.json();
-
                 // Parse error response
-                let error = new Error(body.message || res.statusText);
-                error.status = status || body.status;
-                if (body.details) {
-                    error.details = body.details;
+                let error = new Error(response.message || res.statusText);
+                error.status = status || response.status;
+                if (response.details) {
+                    error.details = response.details;
                 }
 
                 dispatch({
@@ -130,6 +127,11 @@ actions.request = (params = {}) => {
                 });
             }
         }
+
+        return {
+            status,
+            response
+        };
     };
 };
 
