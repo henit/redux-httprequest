@@ -6,6 +6,7 @@ import { STATE_PENDING, STATE_COMPLETE, STATE_FAILED, HTTPREQUEST_CLEAR } from '
 
 const httpDefaultState = {};
 
+// @DEPRECATED
 export default function http(state = httpDefaultState, action) {
 
     switch (action.type) {
