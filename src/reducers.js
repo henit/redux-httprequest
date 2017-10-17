@@ -1,6 +1,16 @@
 import _get from 'lodash/fp/get';
 
 /**
+ * Make initial state store data
+ * @return {object} Initial state
+ */
+export const initialState = () => ({
+    data: null,
+    pending: false,
+    error: null
+});
+
+/**
  * Make state object for an action in the process of a HTTP request
  * @param {object} action Action
  * @param {string} responsePath Path in response data where the actual data is located
