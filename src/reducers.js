@@ -39,6 +39,23 @@ export const loadState = data => {
 };
 
 /**
+ * Change the data of a state object
+ * @param {object} existingState The existing state object
+ * @param {string} path Path to position of changed value
+ * @param {mixed} value New value
+ * @return {object} State
+ */
+export const changeState = (existingState = {}, path, value) => {
+    return {
+        ...existingState,
+        data: {
+            ...(existingState.data || {}),
+            [path]: value
+        }
+    };
+};
+
+/**
  * Clear a state dataset.
  * @return {object} State
  */
