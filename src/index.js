@@ -1,12 +1,13 @@
 import actions, { STATE_PENDING, STATE_COMPLETE, STATE_FAILED } from './actions';
 import reducer from './reducer';
 // import reducers from './reducers';
-import { requestState, loadState } from './reducers';
+import { requestState, loadState, clearState } from './reducers';
 
 export {
     // Reducers
     requestState,
     loadState,
+    clearState,
 
     actions,
     reducer, // @DEPRECATED
