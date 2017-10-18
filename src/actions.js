@@ -227,12 +227,20 @@ actions.request = (type, params = {}) => {
         }
 
         try {
-            const res = await actions._fetch(url, {
-                headers: fetchHeaders,
-                method,
-                body: body ? JSON.stringify(body) : undefined,
-                credentials: 'include'
-            });
+            let res;
+            try {
+                res = await actions._fetch(url, {
+                    headers: fetchHeaders,
+                    method,
+                    body: body ? JSON.stringify(body) : undefined,
+                    credentials: 'include'
+                });
+            } catch (e) {
+                let error = new Error('Can\'t connect to url.');
+                error.details = e.message;
+                error.type = 'ConnectionError';
+                throw error;
+            }
 
             if (!res) {
                 return;
@@ -294,9 +302,9 @@ actions.request = (type, params = {}) => {
                 type: typeError,
                 pending: false,
                 error: {
-                    message: 'Can\'t connect to url.',
-                    details: e.message,
-                    type: 'ConnectionError'
+                    message: e.message,
+                    details: e.details,
+                    type: e.type
                 }
             });
         }

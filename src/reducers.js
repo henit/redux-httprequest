@@ -1,4 +1,5 @@
 import _get from 'lodash/fp/get';
+import _set from 'lodash/fp/set';
 
 /**
  * Make initial state store data
@@ -48,10 +49,7 @@ export const loadState = data => {
 export const changeState = (existingState = {}, path, value) => {
     return {
         ...existingState,
-        data: {
-            ...(existingState.data || {}),
-            [path]: value
-        }
+        data: _set(path, value, existingState.data)
     };
 };
 
