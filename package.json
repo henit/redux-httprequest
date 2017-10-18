@@ -1,6 +1,6 @@
 {
   "name": "redux-httprequest",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Redux actions & reducer for making http requests",
   "main": "lib/index.js",
   "files": [
