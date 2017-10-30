@@ -1,12 +1,13 @@
 import actions, { STATE_PENDING, STATE_COMPLETE, STATE_FAILED } from './actions';
 import reducer from './reducer';
 // import reducers from './reducers';
-import { initialState, requestState, loadState, changeState, clearState } from './reducers';
+import { initialState, requestState, pathRequestState, loadState, changeState, clearState } from './reducers';
 
 export {
     // Reducers
     initialState,
     requestState,
+    pathRequestState,
     loadState,
     changeState,
     clearState,

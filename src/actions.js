@@ -207,6 +207,7 @@ actions.request = (type, params = {}) => {
 
         dispatch({
             type: typeInitiate,
+            status: 'initiate',
             pending: true,
             request: {
                 method,
@@ -226,88 +227,78 @@ actions.request = (type, params = {}) => {
             fetchHeaders.append('Content-Type', 'application/json');
         }
 
+        let res;
         try {
-            let res;
-            try {
-                res = await actions._fetch(url, {
-                    headers: fetchHeaders,
-                    method,
-                    body: body ? JSON.stringify(body) : undefined,
-                    credentials: 'include'
-                });
-            } catch (e) {
-                let error = new Error('Can\'t connect to url.');
-                error.details = e.message;
-                error.type = 'ConnectionError';
-                throw error;
-            }
+            res = await actions._fetch(url, {
+                headers: fetchHeaders,
+                method,
+                body: body ? JSON.stringify(body) : undefined,
+                credentials: 'include'
+            });
+        } catch (e) {
+            let error = new Error('Can\'t connect to url.');
+            error.details = e.message;
+            error.type = 'ConnectionError';
+            throw error;
+        }
 
-            if (!res) {
-                return;
-            }
+        if (!res) {
+            return;
+        }
 
-            const contentType = res.headers.get('Content-Type');
-            const status = res.status;
+        const contentType = res.headers.get('Content-Type');
+        const statusCode = res.status;
 
-            const isJson = Boolean(contentType && (
-                contentType.includes('application/json') || contentType.includes('application/hal+json')
-            ));
+        const isJson = Boolean(contentType && (
+            contentType.includes('application/json') || contentType.includes('application/hal+json')
+        ));
 
-            const response = await (isJson ? res.json() : res.text());
+        const response = await (isJson ? res.json() : res.text());
 
-            if (status >= 200 && status <= 290) {
-                // Success response
+        if (statusCode >= 200 && statusCode <= 290) {
+            // Success response
+            dispatch({
+                type: typeComplete,
+                status: 'complete',
+                receivedAt: (new Date()).toISOString(),
+                pending: false,
+                statusCode,
+                response,
+                error: null
+            });
+
+        } else {
+            // Error response
+            if (isJson) {
                 dispatch({
-                    type: typeComplete,
-                    receivedAt: (new Date()).toISOString(),
+                    type: typeError,
+                    status: 'error',
                     pending: false,
-                    status,
-                    response,
-                    error: null
+                    statusCode,
+                    error: {
+                        message: response.message || res.statusText,
+                        details: response.details,
+                        stack: response.stack
+                    }
                 });
 
             } else {
-                // Error response
-                if (isJson) {
-                    dispatch({
-                        type: typeError,
-                        pending: false,
-                        status,
-                        error: {
-                            message: response.message || res.statusText,
-                            details: response.details,
-                            stack: response.stack
-                        }
-                    });
-
-                } else {
-                    dispatch({
-                        type: typeError,
-                        pending: false,
-                        status,
-                        error: {
-                            message: res.statusText || 'Unknown request error'
-                        }
-                    });
-                }
+                dispatch({
+                    type: typeError,
+                    status: 'error',
+                    pending: false,
+                    statusCode,
+                    error: {
+                        message: res.statusText || 'Unknown request error'
+                    }
+                });
             }
-
-            return {
-                status,
-                response
-            };
-        } catch (e) {
-            // No response
-            dispatch({
-                type: typeError,
-                pending: false,
-                error: {
-                    message: e.message,
-                    details: e.details,
-                    type: e.type
-                }
-            });
         }
+
+        return {
+            statusCode,
+            response
+        };
     };
 };
 

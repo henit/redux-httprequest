@@ -13,16 +13,22 @@ export const initialState = () => ({
 
 /**
  * Make state object for an action in the process of a HTTP request
+ * @param {object} state Existing state (request object)
  * @param {object} action Action
  * @param {string} responsePath Path in response data where the actual data is located
  * @return {object} State
  */
-export const requestState = (action = {}, responsePath = '') => {
+export const requestState = (state, action = {}, responsePath = '') => {
     return {
-        data: _get(`response${responsePath ? `.${responsePath}` : ''}`, action),
+        ...state,
+        data: _get(`response${responsePath ? `.${responsePath}` : ''}`, action) || state.data,
         error: action.error,
         pending: action.pending || false
     };
+};
+
+export const pathRequestState = (path, state, action, responsePath) => {
+    return _set(path, requestState(_get(path, state), action, responsePath), state);
 };
 
 /**
@@ -63,4 +69,8 @@ export const clearState = () => {
         error: null,
         pending: false
     };
+};
+
+export const pathClearState = (path) => {
+    return _set(path, clearState());
 };
