@@ -5,7 +5,7 @@ import _set from 'lodash/fp/set';
  * Make initial state store data
  * @return {object} Initial state
  */
-export const initialState = () => ({
+export const initializeState = () => ({
     data: null,
     pending: false,
     error: null
@@ -57,6 +57,10 @@ export const changeState = (existingState = {}, path, value) => {
         ...existingState,
         data: _set(path, value, existingState.data)
     };
+};
+
+export const pathChangeState = (statePath, state, path, value) => {
+    return _set(statePath, changeState(_get(statePath, state), path, value), state);
 };
 
 /**
