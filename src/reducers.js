@@ -7,7 +7,7 @@ import _set from 'lodash/fp/set';
  */
 export const initializeState = () => ({
     data: null,
-    pending: false,
+    pending: null,
     error: null
 });
 
