@@ -77,6 +77,6 @@ export const clearState = () => {
     };
 };
 
-export const pathClearState = (path) => {
-    return _set(path, clearState());
+export const pathClearState = (path, existingState) => {
+    return _set(path, clearState(), existingState);
 };
