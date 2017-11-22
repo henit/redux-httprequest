@@ -22,6 +22,8 @@ export const requestState = (state, action = {}, responsePath = '') => {
     return {
         ...state,
         data: _get(`response${responsePath ? `.${responsePath}` : ''}`, action) || state.data,
+        receivedAt: action.receivedAt,
+        statusCode: action.statusCode,
         error: action.error,
         pending: action.pending || false
     };
