@@ -2,7 +2,7 @@ import actions, { STATE_PENDING, STATE_COMPLETE, STATE_FAILED } from './actions'
 import reducer from './reducer';
 // import reducers from './reducers';
 import { initializeState, requestState, pathRequestState, loadState, changeState,
-    pathChangeState, clearState } from './reducers';
+    pathChangeState, clearState, pathClearState } from './reducers';
 
 export {
     // Reducers
@@ -13,6 +13,7 @@ export {
     changeState,
     pathChangeState,
     clearState,
+    pathClearState,
 
     actions,
     reducer, // @DEPRECATED
