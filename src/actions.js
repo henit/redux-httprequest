@@ -14,173 +14,6 @@ let actions = {};
 
 actions._fetch = (...args) => fetch(...args);
 
-// @DEPRECATED
-actions.request0 = (params = {}) => {
-    const {
-        baseUrl,
-        headers,
-        method = 'GET',
-        path = '',
-        query = {},
-        body
-        // preserve = false
-        // priority = 3
-    } = params;
-    const requestId = params.requestId || `${method} ${path || '/'}`;
-    const subject = `${method}_` + (
-        params.subject ||
-        requestId.replace(' ', '_').replace('/', '_').toUpperCase()
-    );
-
-    return async (dispatch, getState) => {
-        const url = baseUrl
-            .concat(path)
-            .concat(Object.keys(query).length > 0 ?
-                '?' + Object.keys(query)
-                    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(query[key])}`)
-                    .join('&')
-                :
-                '');
-
-        dispatch({
-            type: `HTTPREQUEST_${subject}_INITIATE`,
-            requestId,
-            params
-        });
-
-        let fetchHeaders = new Headers();
-        if (headers) {
-            for (let name in headers) {
-                fetchHeaders.append(name, headers[name]);
-            }
-        }
-
-        const res = await actions
-            ._fetch(url, {
-                headers: fetchHeaders,
-                method: method || 'GET',
-                body: body ? JSON.stringify(body) : undefined,
-                credentials: 'include'
-            })
-            .catch(e => {
-                let error = new Error('Can\'t connect to url.');
-                error.details = e.message;
-                error.type = 'ConnectionError';
-
-                dispatch({
-                    type: `HTTPREQUEST_${subject}_ERROR`,
-                    requestId,
-                    params,
-                    error
-                });
-            });
-
-        if (!res) {
-            return;
-        }
-
-        const contentType = res.headers.get('Content-Type');
-        const status = res.status;
-
-        const isJson = Boolean(contentType && (
-            contentType.includes('application/json') || contentType.includes('application/hal+json')
-        ));
-
-        const response = await (isJson ? res.json() : res.text());
-
-        if (status >= 200 && status <= 290) {
-            // Success response
-            dispatch({
-                type: `HTTPREQUEST_${subject}_COMPLETE`,
-                receivedAt: (new Date()).toISOString(),
-                requestId,
-                status,
-                response,
-                params
-            });
-
-
-
-        } else {
-            // Error
-            if (isJson) {
-                // Parse error response
-                let error = new Error(response.message || res.statusText);
-                error.status = status || response.status;
-                if (response.details) {
-                    error.details = response.details;
-                }
-
-                dispatch({
-                    type: `HTTPREQUEST_${subject}_ERROR`,
-                    requestId,
-                    status,
-                    params,
-                    error
-                });
-
-            } else {
-                // Error response
-                let error = new Error(res.statusText || 'Unknown request error');
-                error.status = status;
-
-                dispatch({
-                    type: `HTTPREQUEST_${subject}_ERROR`,
-                    requestId,
-                    status,
-                    params,
-                    error
-                });
-            }
-        }
-
-        return {
-            status,
-            response
-        };
-    };
-};
-
-// @DEPRECATED
-actions.jsonRequest = (params = {}) => {
-    return actions.request0({
-        ...params,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(params.headers || {})
-        }
-    });
-};
-
-// @DEPRECATED
-actions.getSingularRestHal = (baseUrl, restName, entityId, requestId) => {
-    return actions.jsonRequest({
-        baseUrl,
-        subject: `ONE_${restName.toUpperCase()}`,
-        path: `${restName}/${entityId}`,
-        preserve: true,
-        requestId
-    });
-};
-
-// @DEPRECATED
-actions.getPluralRestHal = (baseUrl, restName, query = {}, requestId) => {
-    return actions.jsonRequest({
-        baseUrl,
-        subject: restName.toUpperCase(),
-        path: `${restName}/`,
-        responsePath: `_embedded.${restName}`,
-        preserve: true,
-        requestId,
-        query
-    });
-};
-
-
-
-
-
-
 actions.request = (type, params = {}) => {
     const {
         baseUrl,
@@ -236,10 +69,21 @@ actions.request = (type, params = {}) => {
                 credentials: 'include'
             });
         } catch (e) {
-            let error = new Error('Can\'t connect to url.');
+            /*let error = new Error('Can\'t connect to url.');
             error.details = e.message;
             error.type = 'ConnectionError';
-            throw error;
+            throw error;*/
+
+            dispatch({
+                type: typeError,
+                status: 'error',
+                pending: false,
+                statusCode: null,
+                connectionError: true,
+                error: {
+                    message: res.statusText || 'Unknown request error'
+                }
+            });
         }
 
         if (!res) {
@@ -263,6 +107,7 @@ actions.request = (type, params = {}) => {
                 receivedAt: (new Date()).toISOString(),
                 pending: false,
                 statusCode,
+                connectionError: false,
                 response,
                 error: null
             });
@@ -275,6 +120,7 @@ actions.request = (type, params = {}) => {
                     status: 'error',
                     pending: false,
                     statusCode,
+                    connectionError: false,
                     error: {
                         message: response.message || res.statusText,
                         details: response.details,
@@ -288,6 +134,7 @@ actions.request = (type, params = {}) => {
                     status: 'error',
                     pending: false,
                     statusCode,
+                    connectionError: false,
                     error: {
                         message: res.statusText || 'Unknown request error'
                     }
