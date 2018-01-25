@@ -81,7 +81,7 @@ actions.request = (type, params = {}) => {
                 statusCode: null,
                 connectionError: true,
                 error: {
-                    message: res.statusText || 'Unknown request error'
+                    message: 'Can\'t connect to url.'
                 }
             });
         }

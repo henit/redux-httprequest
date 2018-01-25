@@ -13,24 +13,26 @@ export const initializeState = () => ({
 
 /**
  * Make state object for an action in the process of a HTTP request
- * @param {object} state Existing state (request object)
+ * @param {object} existingState Existing state (request object)
  * @param {object} action Action
  * @param {string} responsePath Path in response data where the actual data is located
  * @return {object} State
  */
-export const requestState = (state, action = {}, responsePath = '') => {
+export const requestState = (existingState, action = {}, responsePath = '') => {
     return {
-        ...state,
-        data: _get(`response${responsePath ? `.${responsePath}` : ''}`, action) || state.data,
+        ...existingState,
+        data: _get(`response${responsePath ? `.${responsePath}` : ''}`, action) || existingState.data,
         receivedAt: action.receivedAt,
         statusCode: action.statusCode,
         error: action.error,
+        connectionError: action.connectionError,
         pending: action.pending || false
     };
 };
 
-export const pathRequestState = (path, state, action, responsePath) => {
-    return _set(path, requestState(_get(path, state), action, responsePath), state);
+/* Request state for a specific state path */
+export const pathRequestState = (path, existingState, action, responsePath) => {
+    return _set(path, requestState(_get(path, existingState), action, responsePath), existingState);
 };
 
 /**
@@ -39,12 +41,17 @@ export const pathRequestState = (path, state, action, responsePath) => {
  * @param {object|array} data Data to load
  * @return {object} State
  */
-export const loadState = data => {
+export const loadState = (data = null) => {
     return {
         data,
         error: null,
         pending: false
     };
+};
+
+/* Request state for a specific state path */
+export const pathLoadState = (path, existingState, data) => {
+    return _set(path, loadState(data), existingState);
 };
 
 /**
@@ -77,6 +84,7 @@ export const clearState = () => {
     };
 };
 
+/* Load state for a specific state path */
 export const pathClearState = (path, existingState) => {
     return _set(path, clearState(), existingState);
 };
