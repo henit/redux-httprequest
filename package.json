@@ -15,8 +15,7 @@
     "compile": "babel src --out-dir lib",
     "preversion": "npm run test",
     "prepublish": "npm run compile",
-    "postpublish": "npm run clean",
-    "postinstall": "npm run compile"
+    "postpublish": "npm run clean"
   },
   "repository": {
     "type": "git",
