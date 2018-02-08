@@ -149,6 +149,46 @@ actions.request = (type, params = {}) => {
     };
 };
 
+actions.get = (type, path, query, params = {}) =>
+    actions.request(type, {
+        ...params,
+        method: 'GET',
+        path,
+        query
+    });
+
+actions.post = (type, path, body, params = {}) =>
+    actions.request(type, {
+        ...params,
+        method: 'POST',
+        path,
+        body
+    });
+
+actions.put = (type, path, body, params = {}) =>
+    actions.request(type, {
+        ...params,
+        method: 'PUT',
+        path,
+        body
+    });
+
+actions.patch = (type, path, body, params = {}) =>
+    actions.request(type, {
+        ...params,
+        method: 'PATCH',
+        path,
+        body
+    });
+
+actions.delete = (type, path, query, params = {}) =>
+    actions.request(type, {
+        ...params,
+        method: 'DELETE',
+        path,
+        query
+    });
+
 /**
  * REST Api composed functions
  */
@@ -201,6 +241,12 @@ actions.rest.deleteOne = (baseUrl, type, restName, entityId) => {
 actions.all = baseUrl => {
     return {
         request: (type, params = {}) => actions.request(type, { ...params, baseUrl }),
+        get: (type, path, query, params = {}) => actions.get(type, path, query, { ...params, baseUrl }),
+        post: (type, path, body, params = {}) => actions.post(type, path, body, { ...params, baseUrl }),
+        put: (type, path, body, params = {}) => actions.put(type, path, body, { ...params, baseUrl }),
+        patch: (type, path, body, params = {}) => actions.patch(type, path, body, { ...params, baseUrl }),
+        delete: (type, path, query, params = {}) => actions.delete(type, path, query, { ...params, baseUrl }),
+
         rest: {
             getOne: (...args) => actions.rest.getOne(baseUrl, ...args),
             getMany: (...args) => actions.rest.getMany(baseUrl, ...args),
