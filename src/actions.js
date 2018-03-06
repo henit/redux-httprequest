@@ -14,15 +14,16 @@ let actions = {};
 
 actions._fetch = (...args) => fetch(...args);
 
-actions.request = (type, params = {}) => {
+actions.request = (type, options = {}) => {
     const {
         baseUrl,
         headers,
         method = 'GET',
         path = '',
         query = {},
-        body
-    } = params;
+        body,
+        params // Action parameters (additional to the request info)
+    } = options;
 
     const typeInitiate = (Array.isArray(type) && type[0]) || type || HTTPREQUEST_INITIATE;
     const typeComplete = (Array.isArray(type) && type[1]) || type || HTTPREQUEST_COMPLETE;
@@ -47,7 +48,8 @@ actions.request = (type, params = {}) => {
                 path,
                 query,
                 body
-            }
+            },
+            params
         });
 
         let fetchHeaders = new Headers();
@@ -69,11 +71,6 @@ actions.request = (type, params = {}) => {
                 credentials: 'include'
             });
         } catch (e) {
-            /*let error = new Error('Can\'t connect to url.');
-            error.details = e.message;
-            error.type = 'ConnectionError';
-            throw error;*/
-
             dispatch({
                 type: typeError,
                 status: 'error',
@@ -82,7 +79,8 @@ actions.request = (type, params = {}) => {
                 connectionError: true,
                 error: {
                     message: 'Can\'t connect to url.'
-                }
+                },
+                params
             });
         }
 
@@ -109,7 +107,8 @@ actions.request = (type, params = {}) => {
                 statusCode,
                 connectionError: false,
                 response,
-                error: null
+                error: null,
+                params
             });
 
         } else {
@@ -125,7 +124,8 @@ actions.request = (type, params = {}) => {
                         message: response.message || res.statusText,
                         details: response.details,
                         stack: response.stack
-                    }
+                    },
+                    params
                 });
 
             } else {
@@ -137,7 +137,8 @@ actions.request = (type, params = {}) => {
                     connectionError: false,
                     error: {
                         message: res.statusText || 'Unknown request error'
-                    }
+                    },
+                    params
                 });
             }
         }
@@ -149,41 +150,41 @@ actions.request = (type, params = {}) => {
     };
 };
 
-actions.get = (type, path, query, params = {}) =>
+actions.get = (type, path, query, options = {}) =>
     actions.request(type, {
-        ...params,
+        ...options,
         method: 'GET',
         path,
         query
     });
 
-actions.post = (type, path, body, params = {}) =>
+actions.post = (type, path, body, options = {}) =>
     actions.request(type, {
-        ...params,
+        ...options,
         method: 'POST',
         path,
         body
     });
 
-actions.put = (type, path, body, params = {}) =>
+actions.put = (type, path, body, options = {}) =>
     actions.request(type, {
-        ...params,
+        ...options,
         method: 'PUT',
         path,
         body
     });
 
-actions.patch = (type, path, body, params = {}) =>
+actions.patch = (type, path, body, options = {}) =>
     actions.request(type, {
-        ...params,
+        ...options,
         method: 'PATCH',
         path,
         body
     });
 
-actions.delete = (type, path, query, params = {}) =>
+actions.delete = (type, path, query, options = {}) =>
     actions.request(type, {
-        ...params,
+        ...options,
         method: 'DELETE',
         path,
         query
@@ -240,12 +241,12 @@ actions.rest.deleteOne = (baseUrl, type, restName, entityId) => {
 
 actions.all = baseUrl => {
     return {
-        request: (type, params = {}) => actions.request(type, { ...params, baseUrl }),
-        get: (type, path, query, params = {}) => actions.get(type, path, query, { ...params, baseUrl }),
-        post: (type, path, body, params = {}) => actions.post(type, path, body, { ...params, baseUrl }),
-        put: (type, path, body, params = {}) => actions.put(type, path, body, { ...params, baseUrl }),
-        patch: (type, path, body, params = {}) => actions.patch(type, path, body, { ...params, baseUrl }),
-        delete: (type, path, query, params = {}) => actions.delete(type, path, query, { ...params, baseUrl }),
+        request: (type, options = {}) => actions.request(type, { ...options, baseUrl }),
+        get: (type, path, query, options = {}) => actions.get(type, path, query, { ...options, baseUrl }),
+        post: (type, path, body, options = {}) => actions.post(type, path, body, { ...options, baseUrl }),
+        put: (type, path, body, options = {}) => actions.put(type, path, body, { ...options, baseUrl }),
+        patch: (type, path, body, options = {}) => actions.patch(type, path, body, { ...options, baseUrl }),
+        delete: (type, path, query, options = {}) => actions.delete(type, path, query, { ...options, baseUrl }),
 
         rest: {
             getOne: (...args) => actions.rest.getOne(baseUrl, ...args),
