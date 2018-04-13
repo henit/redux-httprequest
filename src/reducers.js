@@ -19,9 +19,13 @@ export const initializeState = () => ({
  * @return {object} State
  */
 export const requestState = (existingState, action = {}, responsePath = '') => {
+    const responseData = _get(`response${responsePath ? `.${responsePath}` : ''}`, action);
+    const data = (action.statusCode >= 200 && action.statusCode <= 299) ?
+        responseData || undefined : existingState.data;
+
     return {
         ...existingState,
-        data: _get(`response${responsePath ? `.${responsePath}` : ''}`, action) || existingState.data,
+        data,
         receivedAt: action.receivedAt,
         statusCode: action.statusCode,
         error: action.error,
