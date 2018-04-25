@@ -82,6 +82,12 @@ actions.request = (type, options = {}) => {
                 },
                 params
             });
+
+            return {
+                statusCode: null,
+                response: null,
+                connectionError: true
+            };
         }
 
         if (!res) {
