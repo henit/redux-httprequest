@@ -13,6 +13,7 @@
     "test:eslint": "eslint ./src --ext .js,.jsx",
     "clean": "rimraf lib",
     "compile": "babel src --out-dir lib",
+    "compile:watch": "babel --watch src --out-dir lib",
     "preversion": "npm run test",
     "prepublish": "npm run compile",
     "postpublish": "npm run clean"
@@ -28,14 +29,16 @@
   },
   "homepage": "https://github.com/henit/redux-httprequest#readme",
   "devDependencies": {
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
+    "@babel/preset-env": "^7.1.0",
     "ava": "^0.22.0",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.0",
-    "eslint": "^4.7.2"
+    "eslint": "^5.3.0"
   },
   "dependencies": {
-    "core-js": "^2.5.1",
-    "lodash": "^4.17.4",
-    "whatwg-fetch": "^2.0.3"
+    "core-js": "^2.5.7",
+    "lodash": "^4.17.10",
+    "whatwg-fetch": "^2.0.4"
   }
 }

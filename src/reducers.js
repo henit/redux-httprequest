@@ -6,9 +6,9 @@ import _set from 'lodash/fp/set';
  * @return {object} Initial state
  */
 export const initializeState = () => ({
-    data: null,
-    pending: null,
-    error: null
+  data: null,
+  pending: null,
+  error: null
 });
 
 /**
@@ -19,24 +19,24 @@ export const initializeState = () => ({
  * @return {object} State
  */
 export const requestState = (existingState, action = {}, responsePath = '') => {
-    const responseData = _get(`response${responsePath ? `.${responsePath}` : ''}`, action);
-    const data = (action.statusCode >= 200 && action.statusCode <= 299) ?
-        responseData || undefined : existingState.data;
+  const responseData = _get(`response${responsePath ? `.${responsePath}` : ''}`, action);
+  const data = (action.statusCode >= 200 && action.statusCode <= 299) ?
+    responseData || undefined : existingState.data;
 
-    return {
-        ...existingState,
-        data,
-        receivedAt: action.receivedAt,
-        statusCode: action.statusCode,
-        error: action.error,
-        connectionError: action.connectionError,
-        pending: action.pending || false
-    };
+  return {
+    ...existingState,
+    data,
+    receivedAt: action.receivedAt,
+    statusCode: action.statusCode,
+    error: action.error,
+    connectionError: action.connectionError,
+    pending: action.pending || false
+  };
 };
 
 /* Request state for a specific state path */
 export const pathRequestState = (path, existingState, action, responsePath) => {
-    return _set(path, requestState(_get(path, existingState), action, responsePath), existingState);
+  return _set(path, requestState(_get(path, existingState), action, responsePath), existingState);
 };
 
 /**
@@ -46,16 +46,16 @@ export const pathRequestState = (path, existingState, action, responsePath) => {
  * @return {object} State
  */
 export const loadState = (data = null) => {
-    return {
-        data,
-        error: null,
-        pending: false
-    };
+  return {
+    data,
+    error: null,
+    pending: false
+  };
 };
 
 /* Request state for a specific state path */
 export const pathLoadState = (path, existingState, data) => {
-    return _set(path, loadState(data), existingState);
+  return _set(path, loadState(data), existingState);
 };
 
 /**
@@ -66,14 +66,14 @@ export const pathLoadState = (path, existingState, data) => {
  * @return {object} State
  */
 export const changeState = (existingState = {}, path, value) => {
-    return {
-        ...existingState,
-        data: _set(path, value, existingState.data)
-    };
+  return {
+    ...existingState,
+    data: _set(path, value, existingState.data)
+  };
 };
 
 export const pathChangeState = (statePath, state, path, value) => {
-    return _set(statePath, changeState(_get(statePath, state), path, value), state);
+  return _set(statePath, changeState(_get(statePath, state), path, value), state);
 };
 
 /**
@@ -81,14 +81,14 @@ export const pathChangeState = (statePath, state, path, value) => {
  * @return {object} State
  */
 export const clearState = () => {
-    return {
-        data: null,
-        error: null,
-        pending: false
-    };
+  return {
+    data: null,
+    error: null,
+    pending: false
+  };
 };
 
 /* Load state for a specific state path */
 export const pathClearState = (path, existingState) => {
-    return _set(path, clearState(), existingState);
+  return _set(path, clearState(), existingState);
 };
