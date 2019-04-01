@@ -5,8 +5,8 @@ import _set from 'lodash/fp/set';
  * Make initial state store data
  * @return {object} Initial state
  */
-export const initializeState = () => ({
-  data: null,
+export const initializeState = (data = null) => ({
+  data,
   pending: null,
   error: null
 });
